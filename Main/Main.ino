@@ -57,52 +57,56 @@ void loop() {
   encoderDepressState = digitalRead(encoderDepressPin);
 
   //Independent variable Initialization
-  int bbCount = 0;
-  
+  int bb = 0;
   
   //MAIN PROGRAM
+  info();
+  while (feedingButtonState == HIGH && emptyBoxState == HIGH){
+    bbCounter(bb);
+    feed();
+      /* this is for profile limitations
+      if (bbCount => bbLimit){
+      break;
+      }*/
+  }
+  feedCut();
+
+  //Delay in order to see the bbCount
+  delay(3000); 
+  
+}
+
+
+
+//Displays the basic information on screen
+void info(){
   if (emptyBoxState == HIGH){
-    info();
-    if (feedingButtonState == HIGH){
-      feed();
-    }
+    lcd.setCursor(0, 0);
+    lcd.print("Mags left  ");
+    lcd.setCursor(13, 0);
+    lcd.print("INF");       //Will be imnplemented later with TackNet
+    lcd.setCursor(0, 1);
+    lcd.print("Asalto ");   //Later will be changed by profile selections
+    lcd.setCursor(12, 1);
+    lcd.print("/ 30");      //Later will be changed by profile selections
   }
 
-  //Empty deposit ALERT
-  if (emptyBoxState == LOW){
+  //Empty deposit ALERT and refill
+  else{
     lcd.setCursor(0, 0);
     lcd.print("Deposito Vacio  ");
     lcd.setCursor(0, 1);
     lcd.print("Dial + tubo     ");
-    if (feedingButtonState == HIGH){
-      /* this is for profile limitations
-      if (bbCount => bbLimit){
-        break;
-      }
-      */
+    //This ignores all bb Limitations
+    while (feedingButtonState == HIGH && encoderDepressState == HIGH){
       feed();
     }
-    else{
-      feedCut();
-    }
+    feedCut();
   }
 }
 
-void info(){
-  lcd.setCursor(0, 0);
-  lcd.print("No loading limit  ");
-  lcd.setCursor(0, 1);
-  lcd.print("Fusil"); //Later will be changed by profile selections
-  lcd.setCursor(10, 1);
-  lcd.print("30"); //Later will be changed by profile selections
-  lcd.setCursor(13,1);
-  lcd.print(bbCounter());
-}
-
-//This method counts the amount of bbs that have been feed
-int bbCounter(){
-  int bbCount = 0;
-  bbSensorState = digitalRead(bbSensorPin);
+//This method counts and displays the bbs that have been feed
+int bbCounter (int bbCount){
   //Only counts the times the sensor has gone from of to on
   if (lastbbSensorState != bbSensorState){
     if (bbSensorState == HIGH){
@@ -113,17 +117,19 @@ int bbCounter(){
       lastbbSensorState = bbSensorState;
     }
   }
+  lcd.setCursor(9,1);
+  lcd.print (bbCount);
   return bbCount;
+  /*by declaring this as a int function and returning a bbCount
+   we enable the option to use this as a feedCut parameter*/
 }
 
 //This will feed bbs to your magazine
 void feed() {
   digitalWrite(motor, HIGH); //girar motor
-  //bbCounter();
 }
 
+//This stops the motor
 void feedCut(){
   digitalWrite(motor, LOW);
 }
-
-
