@@ -3,16 +3,16 @@ LiquidCrystal lcd(7, 6, 5, 4, 3, 2);
 
 //PIN ASIGMENTS WILL BE CHANGED LATER
 //Buttons pins asignations
-const int feedingButtonPin = 8;
-const int emptyBoxPin = 9;
-const int bbSensorPin = 10;
-const int loadingModePin = 11;
-const int displayModePin = 12;
-const int encoderDepressPin = 13;
+const int emptyBoxPin = 8;
+const int feedingButtonPin =14;
+const int bbSensorPin = 15;
+const int loadingModePin = 16;
+const int displayModePin = 17;
+const int encoderDepressPin = 18;
 // encoder and radio mode switches will be added later
 
 //Actuators pin asigments
-const int motor = 16;
+const int motor = 19;
 
 //Variables reading set up
 int feedingButtonState = 0;
@@ -41,12 +41,13 @@ void setup() {
 
   //TacNet comunications will be added here
 
+  //Activation message
+  lcd.setCursor(0, 0);
+  lcd.print("Ativado");
+  delay(1000); 
 }
 
 void loop() {
-  lcd.setCursor(0, 0);
-  lcd.print("Ativado");
-
   //Button variable initialization
   feedingButtonState = digitalRead(feedingButtonPin);
   emptyBoxState = digitalRead(emptyBoxPin);
@@ -58,33 +59,41 @@ void loop() {
   //Independent variable Initialization
   int bbCount = 0;
   
+  
   //MAIN PROGRAM
-  
-  
-  while (emptyBoxState == HIGH){
+  if (emptyBoxState == HIGH){
     info();
-    while (feedingButtonState == HIGH){
+    if (feedingButtonState == HIGH){
       feed();
     }
   }
+
   //Empty deposit ALERT
-  else{
+  if (emptyBoxState == LOW){
     lcd.setCursor(0, 0);
-    lcd.print("Deposito Vacio");
+    lcd.print("Deposito Vacio  ");
     lcd.setCursor(0, 1);
-    lcd.print("Dial + tubo");
-    if ((feedingButtonState == HIGH) && (encoderDepressState == HIGH)){
+    lcd.print("Dial + tubo     ");
+    if (feedingButtonState == HIGH){
+      /* this is for profile limitations
+      if (bbCount => bbLimit){
+        break;
+      }
+      */
       feed();
+    }
+    else{
+      feedCut();
     }
   }
 }
 
 void info(){
   lcd.setCursor(0, 0);
-  lcd.print("No loading limit");
+  lcd.print("No loading limit  ");
   lcd.setCursor(0, 1);
   lcd.print("Fusil"); //Later will be changed by profile selections
-  lcd.setCursor(0, 13);
+  lcd.setCursor(10, 1);
   lcd.print("30"); //Later will be changed by profile selections
   lcd.setCursor(13,1);
   lcd.print(bbCounter());
@@ -92,6 +101,7 @@ void info(){
 
 //This method counts the amount of bbs that have been feed
 int bbCounter(){
+  int bbCount = 0;
   bbSensorState = digitalRead(bbSensorPin);
   //Only counts the times the sensor has gone from of to on
   if (lastbbSensorState != bbSensorState){
@@ -109,7 +119,11 @@ int bbCounter(){
 //This will feed bbs to your magazine
 void feed() {
   digitalWrite(motor, HIGH); //girar motor
-  bbCounter();
+  //bbCounter();
+}
+
+void feedCut(){
+  digitalWrite(motor, LOW);
 }
 
 
