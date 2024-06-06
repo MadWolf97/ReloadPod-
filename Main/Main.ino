@@ -6,12 +6,12 @@ LiquidCrystal lcd(7, 6, 5, 4, 3, 2);
   const int emptyBoxPin = 8;
   const int feedingButtonPin =14;
   const int bbSensorPin = 15;
-  const int loadingModePin = 16;
+  const int loadingModePin = 17;
   /* will be added with profiles implementation
   const int encoderUpPin
   const int encoderDownPin
   */
-  const int encoderDepressPin = 18;
+  const int encoderDepressPin = 16;
   const int radioSwitchPin = 19;
 
   //Actuators pin asigments
@@ -28,10 +28,25 @@ LiquidCrystal lcd(7, 6, 5, 4, 3, 2);
   int encoderDownState = 0;
   */
   int encoderDepressState = 0;
-  radioSwitchState = 0;
+  int radioSwitchState = 0;
 
   //Utility variables
   int lastbbSensorState = 0;
+
+  //Preset Profiles   (profileName, bbLimit, tokenNeeded)
+  /*
+  ("Pistola",14,1);
+  ("Franco",10,3);
+  ("Selecto",20,3);
+  ("Asalto",30,3);
+  ("Apollo",180,6);
+
+
+  ("LowCap",90);
+  ("MidCap",120);
+  ("MidCap",160);
+  */
+
 
 void setup() {
   // INITIAL PARAMETERS
@@ -58,22 +73,6 @@ void setup() {
   lcd.setCursor(0, 0);
   lcd.print("ACTIVADO");
   delay(1000); 
-
-
-
-  //Preset Profiles
-  /*
-  ("Pistola",14);
-  ("Franco",10);
-  ("Selecto",20);
-  ("Asalto",30);
-  ("Apollo",180);
-
-
-  ("LowCap",90);
-  ("MidCap",120);
-  ("MidCap",160);
-  */
 
   //PreGame settings check
   loadingModeState = digitalRead(loadingModePin);
@@ -112,9 +111,12 @@ void loop() {
   */
   encoderDepressState = digitalRead(encoderDepressPin);
 
-  //Independent variable Initialization
-
-  
+  //Profile and token information adquisition
+  //Temporal try, will be deleted with Profiles implementation
+  String profileName = "PISTOLA     ";
+  int bbLimit = 14;
+  int tokenNeeded = 1;
+  int token = -1;
 
   //MAIN PROGRAM
   if(emptyBoxState == LOW){
@@ -122,11 +124,11 @@ void loop() {
   }
 
   while (emptyBoxState == HIGH && feedingButtonState == LOW){
-    info();
+    info(profileName, bbLimit, tokenNeeded, token);
   }
 
   while (emptyBoxState == HIGH && feedingButtonState == HIGH){
-    bbCounter();
+    bbCounter(bbLimit);
     feedCut();
     //Delay in order to see the bbCount
     delay(3000); 
@@ -134,19 +136,19 @@ void loop() {
 }
 
 // Displays the basic information on screen
-void info(){
+void info(String profileName, int bbLimit, int tokenNeeded, int token){
   lcd.setCursor(0, 0);
-  lcd.print("Mags left  ");
+  lcd.print("MAGS LEFT    ");
   lcd.setCursor(13, 0);
-  lcd.print("INF"); // Will be imnplemented later with TackNet
+  magCounter(token, tokenNeeded); // Will be imnplemented later with TackNet
   lcd.setCursor(0, 1);
-  lcd.print("Asalto "); // Later will be changed by profile selections
+  lcd.print(profileName); // Later will be changed by profile selections
   lcd.setCursor(12, 1);
-  lcd.print("/ 30"); // Later will be changed by profile selections
+  lcd.print("/" + (String) bbLimit); // Later will be changed by profile selections
 }
 
 // Empty deposit ALERT and REFILLING
-void emptyAlert{
+void emptyAlert(){
   lcd.setCursor(0, 0);
   lcd.print("DEPOSITO VACIO  ");
   lcd.setCursor(0, 1);
@@ -159,10 +161,10 @@ void emptyAlert{
 }
 
 //This method feeds bbs, counts and displays the bbs that have been feed
-void bbCounter (){
+String bbCounter (int bbLimit){
   //Only counts the times the sensor has gone from of to on
   int bbCount = 0;
-  int bbLimit = 30; //will be changed later with profile implementation
+  // int bbLimit = 30; //will be changed later with profile implementation
   while (bbCount <= bbLimit){
     feed();
     if (lastbbSensorState != bbSensorState){
@@ -175,7 +177,30 @@ void bbCounter (){
       }
     }
     lcd.setCursor(9,1);
-    lcd.print (bbCount);
+    return (String) bbCount;
+  }
+}
+
+//this method shows how many mags you can reload
+void magCounter (int token, int tokenNeeded){
+  if (token<=-1){
+    lcd.setCursor(13, 0);
+    lcd.print("INF");
+    //aviability = true;
+  }
+  else{
+    int mags = token / tokenNeeded;
+    lcd.setCursor(13, 0);
+    lcd.print(mags);
+    //aviability = true;
+    /*  will be implemented with TackNet
+    if (mags < 0){
+      aviability = true;
+    }
+    else{
+      aviability = false;
+    }
+    */
   }
 }
 
