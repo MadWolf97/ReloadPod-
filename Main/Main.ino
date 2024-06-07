@@ -17,7 +17,8 @@ LiquidCrystal lcd(7, 6, 5, 4, 3, 2);
   //Actuators pin asigments
   const int motor = 19;
 
-//VARIABLES INITIALLIZATION
+
+//GOLBAL VARIABLE INITIALLIZATION
   //Variables reading set up
   int emptyBoxState = 0;
   int feedingButtonState = 0;
@@ -33,13 +34,14 @@ LiquidCrystal lcd(7, 6, 5, 4, 3, 2);
   //Utility variables
   int lastbbSensorState = 0;
 
+  // INITIAL PARAMETERS
   //Preset Profiles   (profileName, bbLimit, tokenNeeded)
   /*
   ("Pistola",14,1);
   ("Franco",10,3);
   ("Selecto",20,3);
   ("Asalto",30,3);
-  ("Apollo",180,6);
+  ("Apollo",180,5);
 
 
   ("LowCap",90);
@@ -47,11 +49,16 @@ LiquidCrystal lcd(7, 6, 5, 4, 3, 2);
   ("MidCap",160);
   */
 
+  //Temporal try, will be deleted with Profiles implementation
+  String profileName;
+  int bbLimit;
+  int tokenNeeded;
+  int token;
 
+
+//THIS LOADS ALL SETTINGS AND MESAGES BEFORE GAME USEAGE
 void setup() {
-  // INITIAL PARAMETERS
-
-  // Button input/output set
+   // Button input/output set
   pinMode(emptyBoxPin, INPUT);
   pinMode(feedingButtonPin, INPUT);
   pinMode(bbSensorPin, INPUT);
@@ -74,60 +81,80 @@ void setup() {
   lcd.print("ACTIVADO");
   delay(1000); 
 
-  //PreGame settings check
-  loadingModeState = digitalRead(loadingModePin);
-  radioSwitchState = digitalRead(radioSwitchPin);
+  void initialSettings(){
+    //PreGame settings check
+    loadingModeState = digitalRead(loadingModePin);
+    radioSwitchState = digitalRead(radioSwitchPin);
 
-  //Independent mode: TackNet OF
-  if (radioSwitchState == LOW){
-    lcd.setCursor(0, 0);
-    lcd.print("MODO DE CONTROL");
-    lcd.setCursor(0, 1);
-    lcd.print("INDEPENDIENTE");
-    delay(1000);
+    //Independent mode: TackNet OF
+    if (radioSwitchState == LOW){
+      lcd.setCursor(0, 0);
+      lcd.print("MODO DE CONTROL");
+      lcd.setCursor(0, 1);
+      lcd.print("INDEPENDIENTE");
+      delay(1000);
+    }
+
+    //Slaved mode: TacNet ON
+    /* WILL BE IMPLEMENTED AT THE END
+    else{
+      lcd.setCursor(0, 0);
+      lcd.print("MODO DE CONTROL");
+      lcd.setCursor(0, 1);
+      lcd.print("ESCLAVIZADO");
+      delay(1000);
+    }
+    */
+
+  /*this will be added with profiles
+    if (loadingModeState == HIGH){
+      profiles limited
+    }
+    else{
+      profiles complete
+    }
+    */
   }
-
-  //Slaved mode: TacNet ON
-  /* WILL BE IMPLEMENTED AT THE END
-  else{
-    lcd.setCursor(0, 0);
-    lcd.print("MODO DE CONTROL");
-    lcd.setCursor(0, 1);
-    lcd.print("ESCLAVIZADO");
-    delay(1000);
-  }
-  */
-
 }
 
-void loop() {
-  //Button variable initialization  
+//This function actualices ONLI the button states needed during refill
+void buttonStateUpdateReduced (){
   emptyBoxState = digitalRead(emptyBoxPin);
   feedingButtonState = digitalRead(feedingButtonPin);
   bbSensorState = digitalRead(bbSensorPin);
+}
+
+//This function actualices ALL the button states for operation
+void buttonStateUpdate (){
+  buttonStateUpdateReduced ();
   /* will be added with profiles implementation
   encoderUpState = digitalRead(encoderUpPin);      
   encoderDownState = digitalRead(encoderDownPin);   
   */
   encoderDepressState = digitalRead(encoderDepressPin);
+}
+
+//MAIN LOOP
+void loop() {
+  buttonStateUpdate();
 
   //Profile and token information adquisition
   //Temporal try, will be deleted with Profiles implementation
-  String profileName = "PISTOLA     ";
-  int bbLimit = 14;
-  int tokenNeeded = 1;
-  int token = -1;
+  profileName = "PISTOLA     ";
+  bbLimit = 14;
+  tokenNeeded = 1;
+  token = -1;
 
   //MAIN PROGRAM
   if(emptyBoxState == LOW){
     emptyAlert();
   }
 
-  while (emptyBoxState == HIGH && feedingButtonState == LOW){
+  if (emptyBoxState == HIGH && feedingButtonState == LOW){
     info(profileName, bbLimit, tokenNeeded, token);
   }
 
-  while (emptyBoxState == HIGH && feedingButtonState == HIGH){
+  while (emptyBoxState == HIGH && feedingButtonState == HIGH){ //&& avialbility = true // will add with TackNet
     bbCounter(bbLimit);
     feedCut();
     //Delay in order to see the bbCount
@@ -140,11 +167,11 @@ void info(String profileName, int bbLimit, int tokenNeeded, int token){
   lcd.setCursor(0, 0);
   lcd.print("MAGS LEFT    ");
   lcd.setCursor(13, 0);
-  magCounter(token, tokenNeeded); // Will be imnplemented later with TackNet
+  magCounter(token, tokenNeeded);
   lcd.setCursor(0, 1);
-  lcd.print(profileName); // Later will be changed by profile selections
+  lcd.print(profileName);
   lcd.setCursor(12, 1);
-  lcd.print("/" + (String) bbLimit); // Later will be changed by profile selections
+  lcd.print("/" + (String) bbLimit);
 }
 
 // Empty deposit ALERT and REFILLING
