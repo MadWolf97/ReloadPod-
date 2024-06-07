@@ -58,6 +58,9 @@ LiquidCrystal lcd(7, 6, 5, 4, 3, 2);
 
 //THIS LOADS ALL SETTINGS AND MESAGES BEFORE GAME USEAGE
 void setup() {
+  //test
+  token = 10;
+
   // Button input/output set
   pinMode(emptyBoxPin, INPUT);
   pinMode(feedingButtonPin, INPUT);
@@ -131,39 +134,46 @@ void buttonStateUpdate (){
   */
   encoderDepressState = digitalRead(encoderDepressPin);
 }
-
+  
 //MAIN LOOP
 void loop() {
   buttonStateUpdate();
 
   //PROFILE AND TOKEN ADQUISITION
   //Temporal try, will be deleted with Profiles implementation
-  profileName = "PISTOLA     ";
-  bbLimit = 140;
+  profileName = "PISTOLA  ";
+  bbLimit = 14;
   tokenNeeded = 2;
-  token = 4;
+
 
   //MAIN PROGRAM
   if(emptyBoxState == LOW){
     emptyAlert();
   }
 
-  if (emptyBoxState == HIGH && feedingButtonState == LOW){
-    info();
-  }
-
-  if (emptyBoxState == HIGH && feedingButtonState == HIGH && aviability == true){ 
-    bbCounter();
-    //Delay in order to see the bbCount
-    delay(3000);
+  else {
     bbCount = 0;
-    if (magLimitation == true){
-      token = token - tokenNeeded;
-      /*
-      TackNet comunication will be added latter
-      */
+    info();
+    if (aviability == true){ 
+      if (feedingButtonState == HIGH){
+        if (magLimitation == true){
+          token = token - tokenNeeded;      
+          /*
+          TackNet comunication will be added latter
+          */
+        }
+          if (magLimitation == false){
+          tokenCounter();
+        }
+        bbCounter();
+        feedCut();
+        //Delay in order to see the bbCount
+        delay(2000);
+      }
     }
   }
+  //Precaution if some of the cicles gets interrupted
+  feedCut();
 }
 
 // Displays the basic information on screen
@@ -177,10 +187,13 @@ void info(){
   else{
     lcd.print("TOKENS USED  ");
     lcd.setCursor(13, 0);
-    lcd.print(numFormat(tokenCounter()));
+    lcd.print(numFormat(token));
+    aviability = true;
   }
   lcd.setCursor(0, 1);
   lcd.print(profileName);
+  lcd.setCursor(9, 1);
+  lcd.print("  0");
   lcd.setCursor(12, 1);
   lcd.print("/" + numFormat(bbLimit));
 }
@@ -202,7 +215,7 @@ void emptyAlert(){
 //This method feeds bbs, counts and displays the bbs that have been feed
 void bbCounter (){
   //Only counts the times the sensor has gone from OFF to ON
-  while (bbCount <= bbLimit){
+  while (bbCount < bbLimit && feedingButtonState == HIGH && emptyBoxState == HIGH){
     feed();
     if (lastbbSensorState != bbSensorState){
       if (bbSensorState == HIGH){
@@ -215,7 +228,7 @@ void bbCounter (){
     }
     lcd.setCursor(9,1);
     lcd.print(numFormat(bbCount));
-    buttonStateUpdateReduced();
+    buttonStateUpdateReduced(); 
   }
   feedCut();
 }
@@ -223,18 +236,17 @@ void bbCounter (){
 //this method shows how many mags you can reload
 int magCounter (){
   int mags = token / tokenNeeded;
-  if (mags < 0){
-    aviability = true;
-  }
-  else{
-    aviability = false;
-  }
+  if (mags > 0){
+      aviability = true;
+    }
+    else{
+      aviability = false;
+    }
   return mags;
 }
 
 //This method counts the amount of tokens it would have consumed during the game
 int tokenCounter(){
-  aviability = true;
   token = token + tokenNeeded;
   return token;
 }
