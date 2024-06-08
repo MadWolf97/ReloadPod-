@@ -8,8 +8,8 @@ LiquidCrystal lcd(7, 6, 5, 4, 3, 2);
   const int bbSensorPin = 15;
   const int loadingModePin = 17;
   /* will be added with profiles implementation
-  const int encoderUpPin
-  const int encoderDownPin
+  const int encoderUpPin = 
+  const int encoderDownPin = 
   */
   const int encoderDepressPin = 16;
   const int radioSwitchPin = 18;
@@ -59,7 +59,7 @@ LiquidCrystal lcd(7, 6, 5, 4, 3, 2);
 //THIS LOADS ALL SETTINGS AND MESAGES BEFORE GAME USEAGE
 void setup() {
   //test
-  token = 10;
+  token = 0;
 
   // Button input/output set
   pinMode(emptyBoxPin, INPUT);
@@ -140,11 +140,19 @@ void loop() {
   buttonStateUpdate();
 
   //PROFILE AND TOKEN ADQUISITION
+  /*Will be added with Taknet
+  getTokens from Main unit
+  */
+
   //Temporal try, will be deleted with Profiles implementation
   profileName = "PISTOLA  ";
   bbLimit = 14;
   tokenNeeded = 2;
-
+  /*
+  profileName = getProfileName();
+  bbLimit = getbbLimit();
+  tokenNeede = getTokenNeeded();
+  */
 
   //MAIN PROGRAM
   if(emptyBoxState == LOW){
@@ -153,18 +161,21 @@ void loop() {
 
   else {
     bbCount = 0;
-    info();
+    infoDisplay();
     if (aviability == true){ 
       if (feedingButtonState == HIGH){
         if (magLimitation == true){
+          //Will be compleetly be changed with TackNet
           token = token - tokenNeeded;      
           /*
           TackNet comunication will be added latter
+          comunicate the amount of tokens consumed to Main Unit
           */
-        }
+          }
           if (magLimitation == false){
-          tokenCounter();
-        }
+            //This is only used for getting the statitics needed for equilibrating games
+            tokenCounter();
+          }
         bbCounter();
         feedCut();
         //Delay in order to see the bbCount
@@ -177,7 +188,8 @@ void loop() {
 }
 
 // Displays the basic information on screen
-void info(){
+void infoDisplay(){
+  //Printing first row, depends on inizialization mode: TackNet ON or OFF
   lcd.setCursor(0, 0);
   if (magLimitation == true){
     lcd.print("MAGS LEFT    ");
@@ -190,6 +202,7 @@ void info(){
     lcd.print(numFormat(token));
     aviability = true;
   }
+  //Printing second row, will display profiles and bbLimitations
   lcd.setCursor(0, 1);
   lcd.print(profileName);
   lcd.setCursor(9, 1);
