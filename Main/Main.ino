@@ -149,7 +149,7 @@ void loop() {
   //BUTTONS UPDATE
   buttonStateUpdate();
   
-  //PROFILE AND TOKEN ADQUISITION
+  //TOKEN ADQUISITION
   /*Will be imlemented with TackNet
   token = tokenUpdate();
   */
@@ -158,14 +158,10 @@ void loop() {
   profileName = "PISTOLA  ";
   bbLimit = 14;
   tokenNeeded = 2;
-  /*
-  profileName = getProfileName();
-  bbLimit = getbbLimit();
-  tokenNeede = getTokenNeeded();
-  */
 
   //MAIN PROGRAM
   while (emptyBoxState == LOW){
+    buttonStateUpdateAlert();
     emptyAlert();
     lastAlert = true;
   }
@@ -178,6 +174,7 @@ void loop() {
 
   while (emptyBoxState == HIGH){
     buttonStateUpdate();
+    //profileManager();
     infoDisplay();
     if (aviability == true){ 
       if (feedingButtonState == HIGH){
@@ -187,7 +184,7 @@ void loop() {
       }
     }
 
-    //Delay to see bbCount
+    //Token management
     if (lastRefill == true){
       if (magLimitation == true){
         //Will be changed with TackNet
@@ -196,12 +193,12 @@ void loop() {
         tokenConsumption(token - tokenNeeded);
         */
       }
-      if (magLimitation == false){
+      else{
         /* This is only used for getting the statitics 
         needed for equilibrating future games */
         tokenCounter();
       }
-      delay(3000);
+      delay(3000);    //Delay to see bbCount
       bbCount = 0;
     }
   }
@@ -235,7 +232,6 @@ void infoDisplay(){
 
 // Empty deposit ALERT and REFILLING
 void emptyAlert(){
-  buttonStateUpdateAlert();
   lcd.setCursor(0, 0);
   lcd.print("DEPOSITO VACIO  ");
   lcd.setCursor(0, 1);
@@ -243,7 +239,7 @@ void emptyAlert(){
   // This ignores all bb Limitations
   while (feedingButtonState == HIGH && encoderDepressState == HIGH){
     feed();
-    buttonStateUpdateReload();
+    buttonStateUpdateAlert();
   }
   feedCut();
 }
@@ -256,11 +252,33 @@ void refillSuccess(){
   lcd.print("   FINALIZADA   ");
 }
 
+/*Will be developed with profile implementation
+//This method controls the profiles
+void profileManager(){
+  if (encoderUpState == HIGH){
+    profileUp();
+    delay(500);
+  }
+  if (encoderDownState == HIGH){
+    profileDown();
+    delay(500);
+  }
+  profileName = getProfileName();
+  bbLimit = getbbLimit();
+  tokenNeeded = getTokenNeeded();
+  if (encoderDepressState == HIGH){
+    setbbLimit();
+    delay(500);
+  }
+}
+*/
+
 //This method feeds bbs, counts and displays the bbs that have been feed
 void bbCounter(){
-  //Only counts the times the sensor has gone from OFF to ON
   while (bbCount < bbLimit && feedingButtonState == HIGH && emptyBoxState == HIGH){
+    buttonStateUpdateReload();
     feed();
+    //Only counts the times the sensor has gone from OFF to ON
     if (lastbbSensorState != bbSensorState){
       if (bbSensorState == HIGH){
         bbCount++;
@@ -270,9 +288,8 @@ void bbCounter(){
         lastbbSensorState = bbSensorState;
       }
     }
-      lcd.setCursor(9,1);
-      lcd.print(numFormat(bbCount));
-      buttonStateUpdateReload(); 
+    lcd.setCursor(9,1);
+    lcd.print(numFormat(bbCount));
   }
   feedCut();
 }
