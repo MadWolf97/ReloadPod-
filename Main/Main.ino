@@ -267,7 +267,7 @@ void profileManager(){
   bbLimit = getbbLimit();
   tokenNeeded = getTokenNeeded();
   if (encoderDepressState == HIGH){
-    setbbLimit();
+    changebbLimit();
     delay(500);
   }
 }
