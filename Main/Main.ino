@@ -222,18 +222,20 @@ void refillSuccess(){
 //This method controls the profiles
 void profileManager(){
   if (encoderUpState == HIGH){
-    array list next
+    i++;
+    profileList(i);
     delay(500);
   }
   if (encoderDownState == HIGH){
-    array list before
+    i--;
+    profileList(i);
     delay(500);
   }
-  profileName = getProfileName();
-  bbLimit = getbbLimit();
-  tokenNeeded = getTokenNeeded();
+  profileName = getProfileName(i);
+  bbLimit = getbbLimit(i);
+  tokenNeeded = getTokenNeeded(i);
   if (encoderDepressState == HIGH){
-    changebbLimit();
+    changebbLimit(i);
     delay(500);
   }
 }
