@@ -178,30 +178,31 @@ void loop() {
 
   while (emptyBoxState == HIGH){
     buttonStateUpdate();
-    bbCount = 0;
     infoDisplay();
     if (aviability == true){ 
       if (feedingButtonState == HIGH){
         lastRefill = true;
         bbCounter();
-        if (magLimitation == true){
-          //Will be changed with TackNet
-          token = token - tokenNeeded;      
-          /*Will be implemented with TackNet
-          tokenConsumption(token = token - tokenNeeded);
-          */
-          }
-          if (magLimitation == false){
-            /* This is only used for getting the statitics 
-            needed for equilibrating future games */
-            tokenCounter();
-          }
         feedCut();
       }
     }
-    //Delay in order to see the last bbCount
+
+    //Delay to see bbCount
     if (lastRefill == true){
+      if (magLimitation == true){
+        //Will be changed with TackNet
+        token = token - tokenNeeded;      
+        /*Will be implemented with TackNet
+        tokenConsumption(token - tokenNeeded);
+        */
+      }
+      if (magLimitation == false){
+        /* This is only used for getting the statitics 
+        needed for equilibrating future games */
+        tokenCounter();
+      }
       delay(3000);
+      bbCount = 0;
     }
   }
   //Precaution if some of the cicles gets interrupted
@@ -234,7 +235,7 @@ void infoDisplay(){
 
 // Empty deposit ALERT and REFILLING
 void emptyAlert(){
-  buttonStateUpdateReduced();
+  buttonStateUpdateAlert();
   lcd.setCursor(0, 0);
   lcd.print("DEPOSITO VACIO  ");
   lcd.setCursor(0, 1);
@@ -242,7 +243,7 @@ void emptyAlert(){
   // This ignores all bb Limitations
   while (feedingButtonState == HIGH && encoderDepressState == HIGH){
     feed();
-    buttonStateUpdateReduced();
+    buttonStateUpdateReload();
   }
   feedCut();
 }
@@ -271,7 +272,7 @@ void bbCounter(){
     }
       lcd.setCursor(9,1);
       lcd.print(numFormat(bbCount));
-      buttonStateUpdateReduced(); 
+      buttonStateUpdateReload(); 
   }
   feedCut();
 }
@@ -315,17 +316,32 @@ void tokenConsumption (int token){
 */
 
 //THE FUNCTIONS BELOW ARE FOR CONVENIENCE
-//This function actualices ONLY the button states needed during refill
-void buttonStateUpdateReduced (){
+//This method actualices the button states only for emergency refill
+void buttonStateUpdateAlert(){
+  emptyBoxState = digitalRead(emptyBoxPin);
+  feedingButtonState = digitalRead(feedingButtonPin);
+  encoderDepressState = digitalRead(encoderDepressPin);
+  //Other operational buttonState Override
+  bbSensorState = 0;
+  /*encoderUpState = 0;      
+  encoderDownState = 0;
+  */
+}
+//This method actualices ONLY the button states needed during refill
+void buttonStateUpdateReload (){
   emptyBoxState = digitalRead(emptyBoxPin);
   feedingButtonState = digitalRead(feedingButtonPin);
   bbSensorState = digitalRead(bbSensorPin);
-  encoderDepressState = digitalRead(encoderDepressPin);
+  //Other operational buttonState Override
+  encoderDepressState = 0;
+  /*encoderUpState = 0;      
+  encoderDownState = 0;
+  */
 }
 
-//This function actualices ALL the button states for regular operation
+//This method actualices ALL the button states for regular operation
 void buttonStateUpdate (){
-  buttonStateUpdateReduced ();
+  buttonStateUpdateReload ();
   /* will be added with profiles implementation
   encoderUpState = digitalRead(encoderUpPin);      
   encoderDownState = digitalRead(encoderDownPin);   
