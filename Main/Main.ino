@@ -1,5 +1,6 @@
 //LIBRARIES
 #include <LiquidCrystal.h>
+
 /*Will be implemented with TackNet
 #include <RF24Network.h>
 #include <RF24.h>
@@ -60,19 +61,19 @@
   bool magLimitation;
   bool aviability;
 
-  // INITIAL PROFILE PARAMETERS
+  /*// INITIAL PROFILE PARAMETERS
+  #include "Profiles-h"
   //Preset Profiles   (profileName, bbLimit, tokenNeeded)
-  /*
-  ("Pistola",14,1);
-  ("Franco",10,3);
-  ("Selecto",20,3);
-  ("Asalto",30,3);
-  ("Apollo",180,5);
+    Profiles 1("PISTOLA   ",14,1);
+    Profiles 2("FRANCO    ",10,3);
+    Profiles 3("SELECTO   ",20,3);
+    Profiles 4("ASALTO    ",30,3);
+    Profiles 5("APOLLO    ",180,5);
+    Profiles 6("LowCap    ",90,10);
+    Profiles 7("MidCap    ",120,14);
+    Profiles 8("MidCap    ",160,19);
 
-
-  ("LowCap",90);
-  ("MidCap",120);
-  ("MidCap",160);
+    this will be added to a ArrayList in order to be able to navigate thru all profiles
   */
 
 //THIS LOADS ALL SETTINGS AND MESAGES BEFORE GAME USEAGE
@@ -186,48 +187,13 @@ void loop() {
 
     //Token management
     if (lastRefill == true){
-      if (magLimitation == true){
-        //Will be changed with TackNet
-        token = token - tokenNeeded;      
-        /*Will be implemented with TackNet
-        tokenConsumption(token - tokenNeeded);
-        */
-      }
-      else{
-        /* This is only used for getting the statitics 
-        needed for equilibrating future games */
-        tokenCounter();
-      }
+      tokenManager();
       delay(3000);    //Delay to see bbCount
       bbCount = 0;
     }
   }
   //Precaution if some of the cicles gets interrupted
   feedCut();
-}
-
-// Displays the basic information on screen
-void infoDisplay(){
-  //Printing first row, depends on inizialization mode: TackNet ON or OFF
-  lcd.setCursor(0, 0);
-  if (magLimitation == true){
-    lcd.print("MAGS LEFT    ");
-    lcd.setCursor(13, 0);
-    lcd.print(numFormat(magCounter()));
-  }
-  else{
-    lcd.print("TOKENS USED  ");
-    lcd.setCursor(13, 0);
-    lcd.print(numFormat(token));
-    aviability = true;
-  }
-  //Printing second row, will display profiles and bbLimitations
-  lcd.setCursor(0, 1);
-  lcd.print(profileName);
-  lcd.setCursor(9, 1);
-  lcd.print("  0");
-  lcd.setCursor(12, 1);
-  lcd.print("/" + numFormat(bbLimit));
 }
 
 // Empty deposit ALERT and REFILLING
@@ -256,11 +222,11 @@ void refillSuccess(){
 //This method controls the profiles
 void profileManager(){
   if (encoderUpState == HIGH){
-    profileUp();
+    array list next
     delay(500);
   }
   if (encoderDownState == HIGH){
-    profileDown();
+    array list before
     delay(500);
   }
   profileName = getProfileName();
@@ -272,6 +238,30 @@ void profileManager(){
   }
 }
 */
+
+// Displays the basic information on screen
+void infoDisplay(){
+  //Printing first row, depends on inizialization mode: TackNet ON or OFF
+  lcd.setCursor(0, 0);
+  if (magLimitation == true){
+    lcd.print("MAGS LEFT    ");
+    lcd.setCursor(13, 0);
+    lcd.print(numFormat(magCounter()));
+  }
+  else{
+    lcd.print("TOKENS USED  ");
+    lcd.setCursor(13, 0);
+    lcd.print(numFormat(token));
+    aviability = true;
+  }
+  //Printing second row, will display profiles and bbLimitations
+  lcd.setCursor(0, 1);
+  lcd.print(profileName);
+  lcd.setCursor(9, 1);
+  lcd.print("  0");
+  lcd.setCursor(12, 1);
+  lcd.print("/" + numFormat(bbLimit));
+}
 
 //This method feeds bbs, counts and displays the bbs that have been feed
 void bbCounter(){
@@ -294,22 +284,21 @@ void bbCounter(){
   feedCut();
 }
 
-//this method shows how many mags you can reload
-int magCounter(){
-  int mags = token / tokenNeeded;
-  if (mags > 0){
-      aviability = true;
-    }
-    else{
-      aviability = false;
-    }
-  return mags;
-}
-
-//This method counts the amount of tokens it would have consumed during the game
-int tokenCounter(){
-  token = token + tokenNeeded;
-  return token;
+//This method will decide what to do after each reload
+void tokenManager(){
+  if (magLimitation == true){
+    //Will be changed with TackNet
+    token = token - tokenNeeded;      
+    /*Will be implemented with TackNet
+    this part will need to send the tokens consumed during the last reoad to the main unit
+    tokenConsumption(token - tokenNeeded);
+    */
+  }
+  else{
+    /* This is only used for getting the statitics 
+    needed for equilibrating future games */
+    token = token + tokenNeeded;
+  }
 }
 
 /*Will be implemented with TackNet
@@ -332,6 +321,18 @@ void tokenConsumption (int token){
 }
 */
 
+//this method shows how many mags you can reload
+int magCounter(){
+  int mags = token / tokenNeeded;
+  if (mags > 0){
+      aviability = true;
+    }
+    else{
+      aviability = false;
+    }
+  return mags;
+}
+
 //THE FUNCTIONS BELOW ARE FOR CONVENIENCE
 //This method actualices the button states only for emergency refill
 void buttonStateUpdateAlert(){
@@ -344,6 +345,7 @@ void buttonStateUpdateAlert(){
   encoderDownState = 0;
   */
 }
+
 //This method actualices ONLY the button states needed during refill
 void buttonStateUpdateReload (){
   emptyBoxState = digitalRead(emptyBoxPin);
