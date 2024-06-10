@@ -173,7 +173,7 @@ void loop() {
     delay (3000);
   }
 
-  while (emptyBoxState == HIGH){
+  if (emptyBoxState == HIGH){
     buttonStateUpdate();
     //profileManager();
     infoDisplay();
