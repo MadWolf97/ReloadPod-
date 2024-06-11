@@ -54,27 +54,28 @@
   //Utility variables
   int lastbbSensorState = 0;
   int bbCount = 0;
-  String profileName;
-  int bbLimit;
-  int tokenNeeded;
-  int token = 0;
-  bool magLimitation;
-  bool aviability;
+  String profileName;   //Given by active profile
+  int bbLimit;          //Given by active profile
+  int tokenNeeded;      //Given by active profile
+  int i = 0;            //Used to select active Profile
+  int token = 0;        //Used for magCounter and TackNet
+  bool aviability;      //Used to limit the acces to magazines when using TackNet
+  
 
   /*// INITIAL PROFILE PARAMETERS
   #include "Profiles-h"
   //Preset Profiles   (profileName, bbLimit, tokenNeeded)
-    Profiles 1("PISTOLA   ",14,1);
-    Profiles 2("FRANCO    ",10,3);
-    Profiles 3("SELECTO   ",20,3);
-    Profiles 4("ASALTO    ",30,3);
-    Profiles 5("APOLLO    ",180,5);
+    Profiles p1("PISTOLA   ",14,1);
+    Profiles p2("FRANCO    ",10,3);
+    Profiles p3("SELECTO   ",20,3);
+    Profiles p4("ASALTO    ",30,3);
+    Profiles p5("APOLLO    ",180,5);
+
     Profiles 6("LowCap    ",90,10);
     Profiles 7("MidCap    ",120,14);
     Profiles 8("MidCap    ",160,19);
-
-    this will be added to a ArrayList in order to be able to navigate thru all profiles
   */
+
 
 //THIS LOADS ALL SETTINGS AND MESAGES BEFORE GAME USEAGE
 void setup() {
@@ -107,7 +108,6 @@ void setup() {
 
   //Independent mode: TackNet OF
   if (radioSwitchState == LOW){
-    magLimitation = false;
     lcd.setCursor(0, 0);
     lcd.print("MODO DE CONTROL");
     lcd.setCursor(0, 1);
@@ -123,7 +123,6 @@ void setup() {
     network.begin(90, this_node);  //(channel, node address)
     radio.setDataRate(RF24_2MBPS);
     */
-    magLimitation = true;
     lcd.setCursor(0, 0);
     lcd.print("MODO DE CONTROL");
     lcd.setCursor(0, 1);
@@ -131,14 +130,16 @@ void setup() {
     delay(1000);
   }
 
-  /*this will be added with profiles
+  /*Will be added with Profiles
+  //This decides wich profiles will be avaliable during the game
   if (loadingModeState == HIGH){
-    profiles limited: REAL CAP
+    Profile *profileArray [5] = {p1, p2, p3, p4, p5};
   }
   else{
-    profiles complete
+    Proflie *profileArray [8] = {p1, p2, p3, p4, p5, p6, p7, p8};
   }
   */
+
 }
 
 //MAIN LOOP
@@ -180,7 +181,7 @@ void loop() {
     if (aviability == true){ 
       if (feedingButtonState == HIGH){
         lastRefill = true;
-        bbCounter();
+        bbFeeder();
         feedCut();
       }
     }
@@ -223,29 +224,58 @@ void refillSuccess(){
 void profileManager(){
   if (encoderUpState == HIGH){
     i++;
-    profileList(i);
+    if (i >= profileArray.length()){  //Loops to first profile
+      i = 0;
+    }
     delay(500);
   }
-  if (encoderDownState == HIGH){
+  if (encoderDownState == HIGH){      
     i--;
-    profileList(i);
+    if (i < 0){                       //Loops to last profile
+      i = profileArray.length();
+    }
     delay(500);
   }
-  profileName = getProfileName(i);
-  bbLimit = getbbLimit(i);
-  tokenNeeded = getTokenNeeded(i);
-  if (encoderDepressState == HIGH){
-    changebbLimit(i);
+
+  //Info about profile update
+  profileName = profileArray[i] -> getProfileName();
+  bbLimit = profileArray[i] -> getbbLimit();
+  tokenNeeded = profileArray[i] -> getTokenNeeded();
+
+  //Profile modification. Only avaliable if mag limitations are not present
+  if (encoderDepressState == HIGH && loadingModeState == LOW){
     delay(500);
+    while(encoderDepressState == LOW){
+      buttonStateUpdate();
+      changebbLimit();
+    }
   }
+}
+
+//This method lets us change the magazine capacity
+void bbChanger(){
+  lcd.setCursor(12, 1);
+  lcd.print("/   ");
+  delay(200);
+  if (encoderUpState == HIGH){
+    bbLimit++;
+  }
+  if (encoderDownState == HIGH && bbLimit < 0){
+    bbLimit--;
+  }
+  profileArray[i] -> setbbLimit(bbLimit);
+  lcd.setCursor(12, 1);
+  lcd.print("/" + numFormat(bbLimit));
+  delay(200);
 }
 */
 
+
 // Displays the basic information on screen
 void infoDisplay(){
-  //Printing first row, depends on inizialization mode: TackNet ON or OFF
+  //Printing first line, depends on inizialization mode: TackNet ON or OFF
   lcd.setCursor(0, 0);
-  if (magLimitation == true){
+  if (radioSwitchState == HIGH){
     lcd.print("MAGS LEFT    ");
     lcd.setCursor(13, 0);
     lcd.print(numFormat(magCounter()));
@@ -256,7 +286,7 @@ void infoDisplay(){
     lcd.print(numFormat(token));
     aviability = true;
   }
-  //Printing second row, will display profiles and bbLimitations
+  //Printing second line, will display profiles and bbLimitations
   lcd.setCursor(0, 1);
   lcd.print(profileName);
   lcd.setCursor(9, 1);
@@ -265,12 +295,20 @@ void infoDisplay(){
   lcd.print("/" + numFormat(bbLimit));
 }
 
-//This method feeds bbs, counts and displays the bbs that have been feed
-void bbCounter(){
-  while (bbCount < bbLimit && feedingButtonState == HIGH && emptyBoxState == HIGH){
-    buttonStateUpdateReload();
-    feed();
-    //Only counts the times the sensor has gone from OFF to ON
+//this method feeds the amount of bbs specified by the profile
+void bbFeeder(){
+    int bbCount = 0;
+    while (bbCount < bbLimit && feedingButtonState == HIGH && emptyBoxState == HIGH){
+        buttonStateUpdateReload();
+        feed();
+        lcd.setCursor(9,1);
+        lcd.print(numFormat(bbCounter()));
+    }
+    feedCut();
+}
+
+//This method counts the bbs feeded and returns its value
+int bbCounter(){
     if (lastbbSensorState != bbSensorState){
       if (bbSensorState == HIGH){
         bbCount++;
@@ -280,15 +318,13 @@ void bbCounter(){
         lastbbSensorState = bbSensorState;
       }
     }
-    lcd.setCursor(9,1);
-    lcd.print(numFormat(bbCount));
-  }
-  feedCut();
+    return bbCount;
 }
 
+//TACKNET REALTED FUNCTIONS
 //This method will decide what to do after each reload
 void tokenManager(){
-  if (magLimitation == true){
+  if (radioSwitchState == HIGH){
     //Will be changed with TackNet
     token = token - tokenNeeded;      
     /*Will be implemented with TackNet
@@ -301,6 +337,18 @@ void tokenManager(){
     needed for equilibrating future games */
     token = token + tokenNeeded;
   }
+}
+
+//this method shows how many mags you can reload
+int magCounter(){
+  int mags = token / tokenNeeded;
+  if (mags > 0){
+      aviability = true;
+    }
+    else{
+      aviability = false;
+    }
+  return mags;
 }
 
 /*Will be implemented with TackNet
@@ -322,18 +370,6 @@ void tokenConsumption (int token){
   }
 }
 */
-
-//this method shows how many mags you can reload
-int magCounter(){
-  int mags = token / tokenNeeded;
-  if (mags > 0){
-      aviability = true;
-    }
-    else{
-      aviability = false;
-    }
-  return mags;
-}
 
 //THE FUNCTIONS BELOW ARE FOR CONVENIENCE
 //This method actualices the button states only for emergency refill
