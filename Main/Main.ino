@@ -238,9 +238,9 @@ void profileManager(){
   }
 
   //Info about profile update
-  profileName = profileArray[i] -> getProfileName();
-  bbLimit = profileArray[i] -> getbbLimit();
-  tokenNeeded = profileArray[i] -> getTokenNeeded();
+  profileName::profileArray[i] -> getProfileName();
+  bbLimit::profileArray[i] -> getbbLimit();
+  tokenNeeded::profileArray[i] -> getTokenNeeded();
 
   //Profile modification. Only avaliable if mag limitations are not present
   if (encoderDepressState == HIGH && loadingModeState == LOW){
