@@ -63,7 +63,7 @@
   
 
   /*// INITIAL PROFILE PARAMETERS
-  #include "Profiles-h"
+  #include "Profiles.h"
   //Preset Profiles   (profileName, bbLimit, tokenNeeded)
     Profiles p1("PISTOLA   ",14,1);
     Profiles p2("FRANCO    ",10,3);

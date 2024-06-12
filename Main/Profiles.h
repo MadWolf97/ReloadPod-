@@ -1,7 +1,7 @@
 #ifndef Profiles_h
 #define Profiles_h
 
-#include "Arduino.h"
+#include <Arduino.h>
 
 class Profiles {
   public:
@@ -11,15 +11,15 @@ class Profiles {
     int tokenNeeded;
 
     //GETTERS
-    String getprofileName(){ return _profileName; }
-    int getbbLimit(){ return _bbLimit; }
+    String getprofileName();
+    int getbbLimit();
 
-    int gettokenNeeded(){ return _tokenNeeded; }
+    int gettokenNeeded();
     
     //SETTERS
-    int setbbLimit(){ _bbLimit = bbLimit; }
+    int setbbLimit(){;
     /*
-    int settokenNeeded(){ _tokenNeeded = tokenNeeded; }
+    int settokenNeeded();
     */
 
   private:
@@ -28,9 +28,4 @@ class Profiles {
       int _tokenNeeded;
 }
 
-//Constructor
-Profiles::Profiles(String profileName, int bbLimit, int tokenNeeded){
-  int _profileName = profileName;
-  int _bbLimit = bbLimit;
-  int _tokenNeeded = tokenNeeded;
-}
+#endif
