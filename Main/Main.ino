@@ -1,3 +1,11 @@
+/**
+ * @author MadWolf97
+ * @brief This is a loong term project to create a net of units 
+ * that will be used to manage the munition resources for a airsoft game 
+ * in various different modes
+ * @version 0.9.2
+ * 
+ */
 //LIBRARIES
 #include <LiquidCrystal.h>
 
@@ -16,7 +24,7 @@
   RF24 radio(10, 9);               // nRF24L01 (CE,CSN)
   RF24Network network(radio);      // Include the radio in the network
   //Radio Buttons asignation
-  const uint16_t this_node = 02;   // Address of our node in Octal format ( 04,031, etc)
+  const uint16_t this_node = 01;   // Address of our node in Octal format ( 04,031, etc)
   const uint16_t master00 = 00;    // Address of the other node in Octal format
   //Radio variable inicialization
   const unsigned long interval = 10;  //ms  // How often to send data to the other unit
