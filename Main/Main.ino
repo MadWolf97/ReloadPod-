@@ -73,15 +73,15 @@
   /*// INITIAL PROFILE PARAMETERS
   #include "Profiles.h"
   //Preset Profiles   (profileName, bbLimit, tokenNeeded)
-    Profiles p1("PISTOLA   ",14,1);
-    Profiles p2("FRANCO    ",10,3);
-    Profiles p3("SELECTO   ",20,3);
-    Profiles p4("ASALTO    ",30,3);
-    Profiles p5("APOLLO    ",180,5);
+    Profile p1 ("PISTOLA   ",14,1);
+    Profile p2 ("FRANCO    ",10,3);
+    Profile p3 ("SELECTO   ",20,3);
+    Profile p4 ("ASALTO    ",30,3);
+    Profile p5 ("APOLLO    ",180,5);
 
-    Profiles 6("LowCap    ",90,10);
-    Profiles 7("MidCap    ",120,14);
-    Profiles 8("MidCap    ",160,19);
+    Profile p6 ("LowCap    ",90,10);
+    Profile p7 ("MidCap    ",120,14);
+    Profile p8 ("MidCap    ",160,19);
   */
 
 

@@ -3,9 +3,9 @@
 
 #include <Arduino.h>
 
-class Profiles {
+class Profile {
   public:
-    Profiles(String profileName, int bbLimit, int tokenNeeded);
+    Profile(String profileName, int bbLimit, int tokenNeeded);
     String profileName;
     int bbLimit;
     int tokenNeeded;
@@ -26,6 +26,6 @@ class Profiles {
       String _profileName;
       int _bbLimit;
       int _tokenNeeded;
-}
+};
 
 #endif
