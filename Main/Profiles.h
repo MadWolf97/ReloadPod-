@@ -17,7 +17,7 @@ class Profile {
     int gettokenNeeded();
     
     //SETTERS
-    int setbbLimit(){;
+    int setbbLimit();
     /*
     int settokenNeeded();
     */

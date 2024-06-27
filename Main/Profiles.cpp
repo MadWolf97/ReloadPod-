@@ -1,7 +1,7 @@
-#include "Profiles_h"
+#include "Profiles.h"
 
 
-Profile(String profileName, int bbLimit, int tokenNeeded){
+/*Profile(String profileName, int bbLimit, int tokenNeeded){
   String profileName;
   int bbLimit;
   int tokenNeeded;
@@ -29,7 +29,7 @@ int gettokenNeeded(){
 //SETTERS
 int setbbLimit(int bbLimit){ 
   _bbLimit = bbLimit; 
-};
+};*/
 /*
 int settokenNeeded(int tokenNeeded){ 
   _tokenNeeded = tokenNeeded; 

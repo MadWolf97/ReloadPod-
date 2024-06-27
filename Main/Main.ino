@@ -1,13 +1,15 @@
+
+
 /**
  * @author MadWolf97
  * @brief This is a loong term project to create a net of units 
  * that will be used to manage the munition resources for a airsoft game 
  * in various different modes
- * @version 0.9.2
+ * @version 0.9.3
  * 
  */
 //LIBRARIES
-#include <LiquidCrystal.h>
+#include <LiquidCrystal_I2C.h>
 
 /*Will be implemented with TackNet
 #include <RF24Network.h>
@@ -16,9 +18,9 @@
 */
 
 //PIN ASIGMENTS MIGHT BE CHANGED LATER
-  //Screen pins asignations
-  LiquidCrystal lcd(7, 6, 5, 4, 3, 2);
-  
+  //Screen definition
+  LiquidCrystal_I2C lcd(0x27,  16, 2);
+
   /*Will be implemented with TackNet
   //Radio pins asignation
   RF24 radio(10, 9);               // nRF24L01 (CE,CSN)
