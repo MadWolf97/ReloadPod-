@@ -1,5 +1,3 @@
-
-
 /**
  * @author MadWolf97
  * @brief This is a loong term project to create a net of units 
@@ -34,19 +32,20 @@
   */
   
   //Buttons pins asignations
-  const int emptyBoxPin = 8;
-  const int feedingButtonPin =14;
-  const int bbSensorPin = 15;
-  const int loadingModePin = 17;
+  #define emptyBoxPin 15
+  #define feedingButtonPin 16
+  #define bbSensorPin 17
+  #define loadingModePin 3
   /* will be added with profiles implementation
-  const int encoderUpPin = 
-  const int encoderDownPin = 
+  #define encoderUpPin 5
+  #define encoderDownPin 6
   */
-  const int encoderDepressPin = 16;
-  const int radioSwitchPin = 18;
+  #define encoderDepressPin 7
+  #define radioSwitchPin 2
+  //#define preGameSetButtonPin 4
 
   //Actuators pin asigments
-  const int motor = 19;
+  #define motor 19
 
 //GOLBAL VARIABLE INITIALLIZATION
   //Variables reading set up
@@ -60,6 +59,7 @@
   */
   int encoderDepressState = 0;
   int radioSwitchState = 0;
+  //int preGameSetButtonState = 0;
 
   //Utility variables
   int lastbbSensorState = 0;
@@ -100,6 +100,7 @@ void setup() {
   */
   pinMode(encoderDepressPin, INPUT);
   pinMode(radioSwitchPin, INPUT);
+  //pinMode(preGameSetButtonPin, INPUT);
 
   //Actuators
   pinMode(motor, OUTPUT);
@@ -115,6 +116,7 @@ void setup() {
   //PreGame settings check
   radioSwitchState = digitalRead(radioSwitchPin);
   loadingModeState = digitalRead(loadingModePin);
+  //preGameSetButtonState = digitalRead(preGameSetButtonPin);
 
   //Independent mode: TackNet OF
   if (radioSwitchState == LOW){
