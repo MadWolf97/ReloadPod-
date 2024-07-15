@@ -36,13 +36,11 @@
   #define feedingButtonPin 16
   #define bbSensorPin 17
   #define loadingModePin 3
-  /* will be added with profiles implementation
   #define encoderUpPin 5
   #define encoderDownPin 6
-  */
   #define encoderDepressPin 7
   #define radioSwitchPin 2
-  //#define preGameSetButtonPin 4
+  #define startUpMenuButtonPin 4
 
   //Actuators pin asigments
   #define motor 19
@@ -53,16 +51,17 @@
   int feedingButtonState = 0;
   int bbSensorState = 0;
   int loadingModeState = 0;
-  /* will be added with profiles implementation
   int encoderUpState = 0;
   int encoderDownState = 0;
-  */
   int encoderDepressState = 0;
   int radioSwitchState = 0;
-  //int preGameSetButtonState = 0;
+  int startUpMenuButtonState = 0;
 
   //Utility variables
   int lastbbSensorState = 0;
+  int lastEncoderUpState = 0;
+  int lastEncoderDownState = 0;
+  int selectionFase = 0;
   int bbCount = 0;
   String profileName;   //Given by active profile
   int bbLimit;          //Given by active profile
@@ -94,13 +93,11 @@ void setup() {
   pinMode(feedingButtonPin, INPUT);
   pinMode(bbSensorPin, INPUT);
   pinMode(loadingModePin, INPUT);
-  /* will be added with profiles implementation
   pinMode(encoderUpPin, INPUT);
   pinMode(encoderDownPin, INPUT);
-  */
   pinMode(encoderDepressPin, INPUT);
   pinMode(radioSwitchPin, INPUT);
-  //pinMode(preGameSetButtonPin, INPUT);
+  pinMode(startUpMenuButtonPin, INPUT);
 
   //Actuators
   pinMode(motor, OUTPUT);
@@ -116,7 +113,7 @@ void setup() {
   //PreGame settings check
   radioSwitchState = digitalRead(radioSwitchPin);
   loadingModeState = digitalRead(loadingModePin);
-  //preGameSetButtonState = digitalRead(preGameSetButtonPin);
+  startUpMenuButtonState = digitalRead(startUpMenuButtonPin);
 
   //Independent mode: TackNet OF
   if (radioSwitchState == LOW){
@@ -282,6 +279,40 @@ void bbChanger(){
 }
 */
 
+//This method is used to change the default bbLimit and tokenNeeded for profiles during starup procedure
+void startMenu(){
+  lcd.setCursor(0, 0);
+  lcd.print(profileName);
+  lcd.setCursor(13, 0);
+  lcd.print(numFormat(bbLimit));
+  lcd.setCursor(0, 1);
+  lcd.print("TOKENS/MAG");
+  lcd.setCursor(13, 1);
+  lcd.print(numFormat(tokenNeeded));
+  switch (selectionFase){
+    case 0:
+      lcd.blink();
+      /*will be implemented with profiles
+      if (encoderUp()) {next profile}
+      if (encoderDown()) {prev rpofile}*/
+      if (encoderDepressState == HIGH) {selectionFase++; delay(200);}
+
+    case 1:
+      lcd.blink();
+      //will be modified with profiles
+      if (encoderUp()) {bbLimit++;}
+      if (encoderDown()) {bbLimit--;}
+      if (encoderDepressState == HIGH) {selectionFase++; delay(200);}
+    
+    case 2:
+      lcd.blink();
+      //will be modified with profiles
+      if (encoderUp()) {tokenNeeded++;}
+      if (encoderDown()) {tokenNeeded--;}
+      if (encoderDepressState == HIGH) {selectionFase = 0; delay(200);}
+  }  
+}
+
 
 // Displays the basic information on screen
 void infoDisplay(){
@@ -326,9 +357,7 @@ int bbCounter(){
         bbCount++;
         lastbbSensorState = bbSensorState;
       }
-      else{
-        lastbbSensorState = bbSensorState;
-      }
+      else{lastbbSensorState = bbSensorState;}
     }
     return bbCount;
 }
@@ -389,11 +418,6 @@ void buttonStateUpdateAlert(){
   emptyBoxState = digitalRead(emptyBoxPin);
   feedingButtonState = digitalRead(feedingButtonPin);
   encoderDepressState = digitalRead(encoderDepressPin);
-  //Other operational buttonState Override
-  bbSensorState = 0;
-  /*encoderUpState = 0;      
-  encoderDownState = 0;
-  */
 }
 
 //This method actualices ONLY the button states needed during refill
@@ -401,20 +425,33 @@ void buttonStateUpdateReload (){
   emptyBoxState = digitalRead(emptyBoxPin);
   feedingButtonState = digitalRead(feedingButtonPin);
   bbSensorState = digitalRead(bbSensorPin);
-  //Other operational buttonState Override
-  encoderDepressState = 0;
-  /*encoderUpState = 0;      
-  encoderDownState = 0;
-  */
 }
 
 //This method actualices ALL the button states for regular operation
 void buttonStateUpdate (){
   buttonStateUpdateReload ();
-  /* will be added with profiles implementation
+  encoderUp();
+  encoderDown();
+}
+
+//Reads the encoder up movements
+bool encoderUp(){
   encoderUpState = digitalRead(encoderUpPin);      
-  encoderDownState = digitalRead(encoderDownPin);   
-  */
+  if (encoderUpState != lastEncoderUpState && encoderUpState == HIGH){
+    lastEncoderUpState = encoderUpState;
+    return true;
+    delay (200);
+  }else {lastEncoderUpState = encoderUpState; return false;}
+}
+
+//Reads the encoder down movements
+bool encoderDown(){
+  encoderDownState = digitalRead(encoderDownPin); 
+  if (encoderDownState != lastEncoderDownState && encoderDownState == HIGH){
+    lastEncoderDownState = encoderDownState;
+    return true;
+    delay (200);
+  }else {lastEncoderDownState = encoderDownState; return false;}
 }
 
 //This method formats the numbers returned by counting methods
