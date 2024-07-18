@@ -3,7 +3,7 @@
  * @brief This is a loong term project to create a net of units 
  * that will be used to manage the munition resources for a airsoft game 
  * in various different modes
- * @version 0.9.3
+ * @version 0.9.4
  * 
  */
 
@@ -212,8 +212,6 @@ void setup() {
     Proflie *profileArray [] = {p1, p2, p3, p4, p5, p6, p7, p8};
   }
   */
-  //test for now
-
 
 }
 
@@ -427,7 +425,3 @@ int bbCounter(){
     }
     return bbCount;
 }
-
-
-
-
