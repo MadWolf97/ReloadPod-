@@ -57,9 +57,13 @@
   int encoderDepressState = 0;
   int radioSwitchState = 0;
   int startUpMenuButtonState = 0;
+  int startUpMenuButtonState = 0;
 
   //Utility variables
   int lastbbSensorState = 0;
+  int lastEncoderUpState = 0;
+  int lastEncoderDownState = 0;
+  int selectionFase = 0;
   int lastEncoderUpState = 0;
   int lastEncoderDownState = 0;
   int selectionFase = 0;
@@ -155,6 +159,7 @@ void setup() {
   pinMode(encoderDepressPin, INPUT);
   pinMode(radioSwitchPin, INPUT);
   pinMode(startUpMenuButtonPin, INPUT);
+  pinMode(startUpMenuButtonPin, INPUT);
 
   //Actuators
   pinMode(motor, OUTPUT);
@@ -171,6 +176,7 @@ void setup() {
   //PreGame settings check
   radioSwitchState = digitalRead(radioSwitchPin);
   loadingModeState = digitalRead(loadingModePin);
+  startUpMenuButtonState = digitalRead(startUpMenuButtonPin);
   startUpMenuButtonState = digitalRead(startUpMenuButtonPin);
 
   //Independent mode: TackNet OF
@@ -338,7 +344,6 @@ void bbChanger(){
   delay(200);
 }
 */
-
 
 //This method is used to change the default bbLimit and tokenNeeded for profiles during starup procedure
 void startMenu(){
