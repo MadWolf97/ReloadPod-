@@ -57,13 +57,9 @@
   int encoderDepressState = 0;
   int radioSwitchState = 0;
   int startUpMenuButtonState = 0;
-  int startUpMenuButtonState = 0;
 
   //Utility variables
   int lastbbSensorState = 0;
-  int lastEncoderUpState = 0;
-  int lastEncoderDownState = 0;
-  int selectionFase = 0;
   int lastEncoderUpState = 0;
   int lastEncoderDownState = 0;
   int selectionFase = 0;
@@ -140,7 +136,7 @@
       Profile p2 ("FRANCO    ",10,3);
       Profile p3 ("SELECTO   ",20,3);
       Profile p4 ("ASALTO    ",30,3);
-      Profile p5 ("APOLLO    ",180,5);
+      Profile p5 ("APOYO     ",180,5);
 
       Profile p6 ("LowCap    ",90,10);
       Profile p7 ("MidCap    ",120,14);
@@ -203,16 +199,13 @@ void setup() {
     delay(1000);
   }
 
-  /*Will be added with Profiles
   //This decides wich profiles will be avaliable during the game
   if (loadingModeState == HIGH){
-    Profile *profileArray [] = {p1, p2, p3, p4, p5};
+    Profile *profileArray [5] = {&p1, &p2, &p3, &p4, &p5};
   }
   else{
-    Proflie *profileArray [] = {p1, p2, p3, p4, p5, p6, p7, p8};
+    Profile *profileArray [8] = {&p1, &p2, &p3, &p4, &p5, &p6, &p7, &p8};
   }
-  */
-
 }
 
 //MAIN LOOP
@@ -229,10 +222,13 @@ void loop() {
   token = tokenUpdate();
   */
 
+  //profileManager();
+
   //Temporal try, will be deleted with Profiles implementation
   profileName = p2.getProfileName();
   bbLimit = p2.getbbLimit();
   tokenNeeded = p2.getTokenNeeded();
+
 
   //MAIN PROGRAM
   while (emptyBoxState == LOW){
@@ -291,8 +287,7 @@ void refillSuccess(){
   lcd.setCursor(0, 1);
   lcd.print("   FINALIZADA   ");
 }
-
-/*Will be developed with profile implementation
+/*
 //This method controls the profiles
 void profileManager(){
   if (encoderUpState == HIGH){
@@ -314,7 +309,8 @@ void profileManager(){
   profileName::profileArray[i] -> getProfileName();
   bbLimit::profileArray[i] -> getbbLimit();
   tokenNeeded::profileArray[i] -> getTokenNeeded();
-
+*/
+/*
   //Profile modification. Only avaliable if mag limitations are not present
   if (encoderDepressState == HIGH && loadingModeState == LOW){
     delay(500);
@@ -324,7 +320,9 @@ void profileManager(){
     }
   }
 }
+*/
 
+/*
 //This method lets us change the magazine capacity
 void bbChanger(){
   lcd.setCursor(12, 1);
@@ -340,8 +338,7 @@ void bbChanger(){
   lcd.setCursor(12, 1);
   lcd.print("/" + numFormat(bbLimit));
   delay(200);
-}
-*/
+}*/
 
 //This method is used to change the default bbLimit and tokenNeeded for profiles during starup procedure
 void startMenu(){
