@@ -1,9 +1,9 @@
 /**
  * @author MadWolf97
  * @brief This is a loong term project to create a net of units 
- * that will be used to manage the munition resources for a airsoft game 
- * in various different modes
- * @version 0.9.4
+ * that will be used to manage the munition resources for airsoft games 
+ * in various modes
+ * @version 1.0.0
  * 
  */
 
@@ -67,15 +67,11 @@
   String profileName;   //Given by active profile
   int bbLimit;          //Given by active profile
   int tokenNeeded;      //Given by active profile
-  int i = 0;            //Used to select active Profile
   int token = 0;        //Used for magCounter and TackNet
   bool aviability;      //Used to limit the acces to magazines when using TackNet
   
 
-  //CLASS DEFINITION 
-  /*
-  will be refractored in to a header and a source file at some point
-  */
+  //CLASS DEFINITION /*will be refractored in to a header and a source file at some point*/
   class Profile {
     public:
       Profile(String profileName, int bbLimit, int tokenNeeded);
@@ -108,7 +104,6 @@
     int _tokenNeeded = tokenNeeded;
   };
 
-
   //GETTERS
   String Profile::getProfileName(){ 
     return _profileName; 
@@ -116,7 +111,6 @@
   int Profile::getbbLimit(){ 
     return _bbLimit; 
   };
-
   int Profile::getTokenNeeded(){ 
     return _tokenNeeded; 
   };
@@ -125,7 +119,6 @@
   int Profile::setbbLimit(int bbLimit){ 
     _bbLimit = bbLimit; 
   };
-
   int Profile::settokenNeeded(int tokenNeeded){ 
     _tokenNeeded = tokenNeeded; 
   };*/
@@ -142,6 +135,10 @@
       Profile p7 ("MidCap    ",120,14);
       Profile p8 ("MidCap    ",160,19);
 
+    //Grobal variables set for profileArray managment
+    Profile *profileArray[]={};   //Stores the profiles
+    int arrayLength;              //Used to set the profile list loop limits
+    int i = 0;                    //Used to select active Profile
 
 //THIS LOADS ALL SETTINGS AND MESAGES BEFORE GAME USEAGE
 void setup() {
@@ -201,10 +198,12 @@ void setup() {
 
   //This decides wich profiles will be avaliable during the game
   if (loadingModeState == HIGH){
-    Profile *profileArray [5] = {&p1, &p2, &p3, &p4, &p5};
+    arrayLength = 5;
+    Profile *profileArray [arrayLength] = {&p1, &p2, &p3, &p4, &p5};
   }
   else{
-    Profile *profileArray [8] = {&p1, &p2, &p3, &p4, &p5, &p6, &p7, &p8};
+    arrayLength = 8;
+    Profile *profileArray [arrayLength] = {&p1, &p2, &p3, &p4, &p5, &p6, &p7, &p8};
   }
 }
 
@@ -222,13 +221,7 @@ void loop() {
   token = tokenUpdate();
   */
 
-  //profileManager();
-
-  //Temporal try, will be deleted with Profiles implementation
-  profileName = p2.getProfileName();
-  bbLimit = p2.getbbLimit();
-  tokenNeeded = p2.getTokenNeeded();
-
+  profileManager();
 
   //MAIN PROGRAM
   while (emptyBoxState == LOW){
@@ -262,7 +255,7 @@ void loop() {
       bbCount = 0;
     }
   }
-  //Precaution if some of the cicles gets interrupted
+  //Precaution in case some of the cicle gets interrupted
   feedCut();
 }
 
@@ -287,40 +280,29 @@ void refillSuccess(){
   lcd.setCursor(0, 1);
   lcd.print("   FINALIZADA   ");
 }
-/*
+
 //This method controls the profiles
 void profileManager(){
   if (encoderUpState == HIGH){
     i++;
-    if (i >= profileArray.length()){  //Loops to first profile
+    if (i >= arrayLength){          //Loops to first profile
       i = 0;
     }
     delay(500);
   }
   if (encoderDownState == HIGH){      
     i--;
-    if (i < 0){                       //Loops to last profile
-      i = profileArray.length();
+    if (i < 0){                     //Loops to last profile
+      i = arrayLength;
     }
     delay(500);
   }
 
   //Info about profile update
-  profileName::profileArray[i] -> getProfileName();
-  bbLimit::profileArray[i] -> getbbLimit();
-  tokenNeeded::profileArray[i] -> getTokenNeeded();
-*/
-/*
-  //Profile modification. Only avaliable if mag limitations are not present
-  if (encoderDepressState == HIGH && loadingModeState == LOW){
-    delay(500);
-    while(encoderDepressState == LOW){
-      buttonStateUpdate();
-      changebbLimit();
-    }
-  }
+  profileArray[i] -> getProfileName();
+  profileArray[i] -> getbbLimit();
+  profileArray[i] -> getTokenNeeded();
 }
-*/
 
 /*
 //This method lets us change the magazine capacity
@@ -373,7 +355,6 @@ void startMenu(){
       if (encoderDepressState == HIGH) {selectionFase = 0; delay(200);}
   }  
 }
-
 
 // Displays the basic information on screen
 void infoDisplay(){
