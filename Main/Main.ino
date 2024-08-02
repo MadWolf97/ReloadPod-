@@ -44,7 +44,7 @@
   #define startUpMenuButtonPin 4
 
   //Actuators pin asigments
-  #define motor 19
+  #define motor 18
 
 //GOLBAL VARIABLE INITIALLIZATION
   //Variables reading set up
@@ -55,8 +55,8 @@
   int encoderUpState = 0;
   int encoderDownState = 0;
   int encoderDepressState = 0;
-  int radioSwitchState = 0;
-  int startUpMenuButtonState = 0;
+  int radioSwitchState = 1;
+  int startUpMenuButtonState= 0;
 
   //Utility variables
   int lastbbSensorState = 0;
@@ -138,7 +138,7 @@
     //Grobal variables set for profileArray managment
     Profile *profileArray[]={};   //Stores the profiles
     int arrayLength;              //Used to set the profile list loop limits
-    int i = 0;                    //Used to select active Profile
+    int i = 1;                    //Used to select active Profile
 
 //THIS LOADS ALL SETTINGS AND MESAGES BEFORE GAME USEAGE
 void setup() {
@@ -152,7 +152,6 @@ void setup() {
   pinMode(encoderDepressPin, INPUT);
   pinMode(radioSwitchPin, INPUT);
   pinMode(startUpMenuButtonPin, INPUT);
-  pinMode(startUpMenuButtonPin, INPUT);
 
   //Actuators
   pinMode(motor, OUTPUT);
@@ -165,6 +164,7 @@ void setup() {
   lcd.setCursor(0, 0);
   lcd.print("ACTIVADO");
   delay(1000); 
+  lcd.clear();
 
   //PreGame settings check
   radioSwitchState = digitalRead(radioSwitchPin);
@@ -179,6 +179,7 @@ void setup() {
     lcd.setCursor(0, 1);
     lcd.print("INDEPENDIENTE");
     delay(1000);
+    lcd.clear();
   }
 
   //Slaved mode: TacNet ON
@@ -194,6 +195,7 @@ void setup() {
     lcd.setCursor(0, 1);
     lcd.print("ESCLAVIZADO");
     delay(1000);
+    lcd.clear();
   }
 
   //This decides wich profiles will be avaliable during the game
@@ -221,7 +223,6 @@ void loop() {
   token = tokenUpdate();
   */
 
-  profileManager();
 
   //MAIN PROGRAM
   while (emptyBoxState == LOW){
@@ -238,7 +239,7 @@ void loop() {
 
   if (emptyBoxState == HIGH){
     buttonStateUpdate();
-    //profileManager();
+    profileManager();
     infoDisplay();
     if (aviability == true){ 
       if (feedingButtonState == HIGH){
@@ -279,10 +280,13 @@ void refillSuccess(){
   lcd.print("     RECARGA    ");
   lcd.setCursor(0, 1);
   lcd.print("   FINALIZADA   ");
+  delay(1000);
+  lcd.clear();
 }
 
 //This method controls the profiles
 void profileManager(){
+  buttonStateUpdate();
   if (encoderUpState == HIGH){
     i++;
     if (i >= arrayLength){          //Loops to first profile
@@ -299,9 +303,9 @@ void profileManager(){
   }
 
   //Info about profile update
-  profileArray[i] -> getProfileName();
-  profileArray[i] -> getbbLimit();
-  profileArray[i] -> getTokenNeeded();
+  profileName = profileArray[i] -> getProfileName();
+  bbLimit = profileArray[i] -> getbbLimit();
+  tokenNeeded = profileArray[i] -> getTokenNeeded();
 }
 
 /*
@@ -323,7 +327,7 @@ void bbChanger(){
 }*/
 
 //This method is used to change the default bbLimit and tokenNeeded for profiles during starup procedure
-void startMenu(){
+/*void startMenu(){
   lcd.setCursor(0, 0);
   lcd.print(profileName);
   lcd.setCursor(13, 0);
@@ -337,7 +341,7 @@ void startMenu(){
       lcd.blink();
       /*will be implemented with profiles
       if (encoderUp()) {next profile}
-      if (encoderDown()) {prev rpofile}*/
+      if (encoderDown()) {prev rpofile}*
       if (encoderDepressState == HIGH) {selectionFase++; delay(200);}
 
     case 1:
@@ -354,7 +358,7 @@ void startMenu(){
       if (encoderDown()) {tokenNeeded--;}
       if (encoderDepressState == HIGH) {selectionFase = 0; delay(200);}
   }  
-}
+}*/
 
 // Displays the basic information on screen
 void infoDisplay(){
