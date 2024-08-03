@@ -3,7 +3,7 @@
  * @brief This is a loong term project to create a net of units 
  * that will be used to manage the munition resources for airsoft games 
  * in various modes
- * @version 1.0.0
+ * @version 0.9.1 
  * 
  */
 
@@ -44,19 +44,19 @@
   #define startUpMenuButtonPin 4
 
   //Actuators pin asigments
-  #define motor 18
+  #define motor 20
 
 //GOLBAL VARIABLE INITIALLIZATION
   //Variables reading set up
   int emptyBoxState = 0;
   int feedingButtonState = 0;
   int bbSensorState = 0;
-  int loadingModeState = 0;
+  bool loadingModeState;
   int encoderUpState = 0;
   int encoderDownState = 0;
   int encoderDepressState = 0;
-  int radioSwitchState = 1;
-  int startUpMenuButtonState= 0;
+  bool radioSwitchState;
+  bool startUpMenuButtonState= 0;
 
   //Utility variables
   int lastbbSensorState = 0;
@@ -170,10 +170,10 @@ void setup() {
   radioSwitchState = digitalRead(radioSwitchPin);
   loadingModeState = digitalRead(loadingModePin);
   startUpMenuButtonState = digitalRead(startUpMenuButtonPin);
-  startUpMenuButtonState = digitalRead(startUpMenuButtonPin);
+  delay(1000); //delete?
 
   //Independent mode: TackNet OF
-  if (radioSwitchState == LOW){
+  if (radioSwitchState == false){
     lcd.setCursor(0, 0);
     lcd.print("MODO DE CONTROL");
     lcd.setCursor(0, 1);
@@ -199,7 +199,7 @@ void setup() {
   }
 
   //This decides wich profiles will be avaliable during the game
-  if (loadingModeState == HIGH){
+  if (loadingModeState == true){
     arrayLength = 5;
     Profile *profileArray [arrayLength] = {&p1, &p2, &p3, &p4, &p5};
   }
@@ -235,6 +235,7 @@ void loop() {
   if (lastAlert == true){
     refillSuccess();
     delay (3000);
+    lastAlert = false; //delete?
   }
 
   if (emptyBoxState == HIGH){
