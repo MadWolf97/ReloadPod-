@@ -3,7 +3,7 @@
  * @brief This is a loong term project to create a net of units 
  * that will be used to manage the munition resources for airsoft games 
  * in various modes
- * @version 0.9.1 
+ * @version 0.9.1b
  * 
  */
 
@@ -211,19 +211,71 @@ void setup() {
 
 //MAIN LOOP
 void loop() {
+/*
   //LOOP VARIABLES INICIALIZATION
   bool lastAlert = false;
   bool lastRefill = false;
-
+*/
   //BUTTONS UPDATE
   buttonStateUpdate();
+  //Button test
+  if (emptyBoxState == HIGH){
+    lcd.setCursor(0, 0);
+    lcd.print("E");
+  }
+  if (feedingButtonState == HIGH){
+    lcd.setCursor(1, 0);
+    lcd.print("F");
+  }
+   if (bbSensorState == HIGH){
+    lcd.setCursor(2, 0);
+    lcd.print("b");
+  }
+  if (loadingModeState == HIGH){
+    lcd.setCursor(3, 0);
+    lcd.print("L");
+  }
+
+  if (encoderUp()==true){
+    lcd.setCursor(5, 0);
+    lcd.print("D");
+  }
+  if (encoderUpState == HIGH){
+    lcd.setCursor(4, 0);
+    lcd.print("U");
+  }
   
+  if (encoderDownState == HIGH){
+    lcd.setCursor(5, 0);
+    lcd.print("D");
+  }
+  if (encoderDown()==true){
+    lcd.setCursor(5, 1);
+    lcd.print("d");
+  }
+  
+  if (encoderDepressState == HIGH){
+    lcd.setCursor(6, 0);
+    lcd.print("P");
+  }
+  if (radioSwitchState == HIGH){
+    lcd.setCursor(7, 0);
+    lcd.print("E");
+  }
+  if (startUpMenuButtonState == HIGH){
+    lcd.setCursor(8, 0);
+    lcd.print("E");
+  }
+  delay(1000); 
+  lcd.clear();
+
   //TOKEN ADQUISITION
   /*Will be imlemented with TackNet
   token = tokenUpdate();
   */
 
-
+  
+/*
   //MAIN PROGRAM
   while (emptyBoxState == LOW){
     buttonStateUpdateAlert();
@@ -259,6 +311,7 @@ void loop() {
   }
   //Precaution in case some of the cicle gets interrupted
   feedCut();
+*/
 }
 
 // Empty deposit ALERT and REFILLING
